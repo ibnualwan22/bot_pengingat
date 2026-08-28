@@ -13,21 +13,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }); // Acknowledge other events
     }
     
-    const { from, message } = payload.data;
-    
-    // Check if the message contains our default group JID anywhere in the payload
-    const defaultGroup = process.env.WA_DEFAULT_GROUP;
-    const payloadStr = JSON.stringify(payload);
-    
-    if (!defaultGroup || !payloadStr.includes(defaultGroup)) {
-      return NextResponse.json({ message: "Ignored, not from target group" });
-    }
-
+    const from = payload.data.from;
+    const message = payload.data.content || payload.data.message || '';
     
     // Check if AI Agent is enabled in settings
     const activeSetting = await prisma.setting.findUnique({
       where: { key: 'AI_BOT_ACTIVE' }
     });
+
     
     if (activeSetting?.value !== 'true') {
       return NextResponse.json({ message: "AI Agent is currently disabled" });
@@ -44,7 +37,8 @@ export async function POST(request: Request) {
     
     const reply = await generateChatResponse([{ role: 'user', content: prompt }]);
     
-    if (reply) {
+    const defaultGroup = process.env.WA_DEFAULT_GROUP;
+    if (reply && defaultGroup) {
       await sendWaMessage(defaultGroup, reply);
     }
 
