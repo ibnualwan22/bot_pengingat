@@ -23,6 +23,18 @@ export async function POST() {
       }
     }
     
+    const defaultJid = process.env.WA_DEFAULT_GROUP;
+    if (defaultJid) {
+      groups = groups.filter((g: any) => g.JID === defaultJid);
+      
+      // Bersihkan grup lain dari Database agar hanya sisa 1 grup
+      await prisma.group.deleteMany({
+        where: {
+          jid: { not: defaultJid }
+        }
+      });
+    }
+    
     const results = [];
     
     for (const group of groups) {
