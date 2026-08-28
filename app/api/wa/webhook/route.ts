@@ -106,8 +106,9 @@ Instruksi Final:
       { role: 'user', content: userPrompt }
     ]);
 
-    if (reply && targetChat) {
-      await sendWaMessage(targetChat, reply);
+    const defaultGroup = process.env.WA_DEFAULT_GROUP;
+    if (reply && defaultGroup) {
+      await sendWaMessage(defaultGroup, reply);
     }
 
     return NextResponse.json({ success: true });
