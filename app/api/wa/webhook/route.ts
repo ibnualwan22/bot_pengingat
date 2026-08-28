@@ -101,15 +101,13 @@ Instruksi Final:
 
     const userPrompt = `Pesan masuk: "${message}"`;
 
-    const combinedPrompt = `${systemPrompt}\n\nPENTING: Identitasmu adalah Udin Kebab sedulur Aksara! WAJIB balas pakai bahasa gaul/tongkrongan! JANGAN membalas seperti asisten formal! Balaslah selayaknya teman ngobrol murni.\n\n${userPrompt}`;
-
     const reply = await generateChatResponse([
-      { role: 'user', content: combinedPrompt }
+      { role: 'system', content: systemPrompt + '\n\nPENTING: Identitasmu adalah Udin Kebab sedulur Aksara! WAJIB balas pakai bahasa gaul/tongkrongan! JANGAN membalas seperti asisten formal! Balaslah selayaknya teman ngobrol murni.' },
+      { role: 'user', content: userPrompt }
     ]);
 
-    const defaultGroup = process.env.WA_DEFAULT_GROUP;
-    if (reply && defaultGroup) {
-      await sendWaMessage(defaultGroup, reply);
+    if (reply && targetChat) {
+      await sendWaMessage(targetChat, reply);
     }
 
     return NextResponse.json({ success: true });
