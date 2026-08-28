@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Group {
+  id               Int      @id @default(autoincrement())
+  jid              String   @unique
+  name             String
+  topic            String?
+  participantCount Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  scheduledMessages ScheduledMessage[]
+  messageLogs       MessageLog[]
+}
+
+model ScheduledMessage {
+  id             Int      @id @default(autoincrement())
+  groupId        Int
+  group          Group    @relation(fields: [groupId], references: [id])
+  message        String   @db.Text
+  cronExpression String
+  repeatType     RepeatType
+  isActive       Boolean  @default(true)
+  nextRunAt      DateTime?
+  lastRunAt      DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  messageLogs    MessageLog[]
+}
+
+model MessageLog {
+  id                 Int      @id @default(autoincrement())
+  scheduledMessageId Int?
+  scheduledMessage   ScheduledMessage? @relation(fields: [scheduledMessageId], references: [id])
+  groupId            Int
+  group              Group    @relation(fields: [groupId], references: [id])
+  message            String   @db.Text
+  status             SendStatus
+  errorMessage       String?
+  sentAt             DateTime @default(now())
+}
+
+model AiConversation {
+  id        Int      @id @default(autoincrement())
+  role      String   // "user" | "assistant"
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+enum RepeatType {
+  ONCE
+  DAILY
+  WEEKLY
+  MONTHLY
+  CUSTOM
+}
+
+enum SendStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
