@@ -4,11 +4,19 @@ import qrcode from 'qrcode-terminal';
 import { prisma } from './lib/prisma';
 import { generateChatResponse } from './lib/agnes';
 
-// Inisialisasi client whatsapp-web.js
 const client = new Client({
     authStrategy: new LocalAuth({ dataPath: './.wwebjs_auth' }),
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+            '--no-sandbox', 
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
+        ],
     }
 });
 
