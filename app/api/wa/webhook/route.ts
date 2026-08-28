@@ -6,6 +6,7 @@ import { sendWaMessage } from '@/lib/wa';
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
+    console.log("=> WEBHOOK RECEIVED PAYLOAD:", JSON.stringify(payload, null, 2));
     
     // Check if event is message:received
     if (payload.event !== 'message:received' || !payload.data) {
