@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { Client, LocalAuth, Message } from 'whatsapp-web.js';
+// @ts-ignore
 import qrcode from 'qrcode-terminal';
 import { prisma } from './lib/prisma';
 import { generateChatResponse } from './lib/agnes';
