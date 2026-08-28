@@ -15,11 +15,14 @@ export async function POST(request: Request) {
     
     const { from, message } = payload.data;
     
-    // Check if the message is from our default group
+    // Check if the message contains our default group JID anywhere in the payload
     const defaultGroup = process.env.WA_DEFAULT_GROUP;
-    if (!defaultGroup || from !== defaultGroup) {
+    const payloadStr = JSON.stringify(payload);
+    
+    if (!defaultGroup || !payloadStr.includes(defaultGroup)) {
       return NextResponse.json({ message: "Ignored, not from target group" });
     }
+
     
     // Check if AI Agent is enabled in settings
     const activeSetting = await prisma.setting.findUnique({
