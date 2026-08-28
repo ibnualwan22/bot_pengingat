@@ -7,6 +7,11 @@ export async function POST(request: Request) {
   try {
     const payload = await request.json();
     console.log("=> WEBHOOK RECEIVED PAYLOAD:", JSON.stringify(payload, null, 2));
+    console.log("=> PAYLOAD KEYS:", Object.keys(payload));
+    if (payload.data) {
+      console.log("=> DATA KEYS:", Object.keys(payload.data));
+      console.log("=> DATA FULL DUMP:", JSON.stringify(payload.data, null, 2));
+    }
 
     // Check if event is message:received
     if (payload.event !== 'message:received' || !payload.data) {
@@ -26,7 +31,7 @@ export async function POST(request: Request) {
 
     // Command untuk mematikan dan menghidupkan bot dari WA
     const msgText = message.trim().toLowerCase();
-    const targetChat = from || process.env.WA_DEFAULT_GROUP;
+    const defaultGroup = process.env.WA_DEFAULT_GROUP;
 
     if (msgText === '/bot off' || msgText === '/udin tidur') {
       await prisma.setting.upsert({
@@ -34,8 +39,8 @@ export async function POST(request: Request) {
         update: { value: 'false' },
         create: { key: 'AI_BOT_ACTIVE', value: 'false' }
       });
-      if (targetChat) {
-         await sendWaMessage(targetChat, "Udin Kebab pamit tidur dulu yagesya. Zzz...");
+      if (defaultGroup) {
+         await sendWaMessage(defaultGroup, "Udin Kebab pamit tidur dulu yagesya. Zzz...");
       }
       return NextResponse.json({ success: true, message: "Bot disabled" });
     }
@@ -46,8 +51,8 @@ export async function POST(request: Request) {
         update: { value: 'true' },
         create: { key: 'AI_BOT_ACTIVE', value: 'true' }
       });
-      if (targetChat) {
-         await sendWaMessage(targetChat, "Udin Kebab udah bangun cuy! Ada yang bisa dibantu?");
+      if (defaultGroup) {
+         await sendWaMessage(defaultGroup, "Udin Kebab udah bangun cuy! Ada yang bisa dibantu?");
       }
       return NextResponse.json({ success: true, message: "Bot enabled" });
     }
@@ -106,7 +111,6 @@ Instruksi Final:
       { role: 'user', content: userPrompt }
     ]);
 
-    const defaultGroup = process.env.WA_DEFAULT_GROUP;
     if (reply && defaultGroup) {
       await sendWaMessage(defaultGroup, reply);
     }
