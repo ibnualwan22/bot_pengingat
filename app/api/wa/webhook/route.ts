@@ -16,6 +16,11 @@ export async function POST(request: Request) {
     const from = payload.data.from;
     const message = payload.data.content || payload.data.message || '';
     
+    // Prevent Cross-Session Infinite Loops (if user registered identical webhooks on multiple WA accounts)
+    if (payload.data.session_id !== process.env.WA_SESSION_ID) {
+      return NextResponse.json({ message: "Ignored, webhook originated from a secondary session" });
+    }
+    
     // Check if AI Agent is enabled in settings
     const activeSetting = await prisma.setting.findUnique({
       where: { key: 'AI_BOT_ACTIVE' }
