@@ -56,7 +56,6 @@ export default function AIChatPage() {
       });
       if (res.ok) {
         setWebhookStatus('success');
-        setTimeout(() => setWebhookStatus('idle'), 3000);
       } else {
         setWebhookStatus('error');
       }
